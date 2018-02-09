@@ -11,7 +11,7 @@ absolutely Julia object. Is is highly inspired by [python-fire](https://github.c
 # Installation
 
 ```julia
-Pkg.clone()
+Pkg.clone(git@github.com:Roger-luo/CLI.jl.git)
 ```
 
 # Basic Usage
@@ -76,7 +76,7 @@ To define a parse rule, you have to specific which kind of expression it will pa
 end
 ```
 
-By overloading `exec` method, one can tweak the way of executing certain type. The following is an example for executing `Function` entries.
+By overloading `exec` method, one can tweak the way of executing certain type. The following is an example for executing `Function` entries. For example, this function defines how `Function` will be executed (it will take command line arguemetns as its arguements and options as its keywords).
 
 ```julia
 function exec(entry::Entry{Function}, cmd::Command)
