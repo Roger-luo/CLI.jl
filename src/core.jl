@@ -19,8 +19,9 @@ struct Command
 end
 
 struct Entry{T}
-    name::Union{Symbol, Expr}
-    fullname::Expr # module name
+    name::Union{Symbol, Expr, Void}
+    fullname::Union{Expr, Void} # module name
+    value
 end
 
 struct Parser{T}
@@ -73,7 +74,11 @@ end
 function Entry{T}(::Type{T}, name)
     mname = current_module_name()
     fullname = join([mname, name], ".")
-    return Entry{T}(name, parse(fullname))
+    return Entry{T}(name, parse(fullname), nothing)
+end
+
+function Entry(::Type{Number}, value)
+    return Entry{Number}(:nothing, :nothing, value)
 end
 
 function keyword(text::AbstractString)
@@ -115,10 +120,11 @@ macro fire(obj)
     min_match = Any
     m = nothing
     for (t, f) in ENVS["parsers"]
-        m = f(obj)
-        if m != nothing
+        out = f(obj)
+        if out != nothing
             # find min_match
             if t <: min_match
+                m = out
                 min_match = t
             end
         end

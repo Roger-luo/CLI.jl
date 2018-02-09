@@ -76,16 +76,16 @@ function exec(entry::Entry{Callable}, cmd::Command)
     return eval(expr)
 end
 
-@register function parse(obj)::Number
+@register function parse(obj)::Any
     if isa(obj, Symbol)
-        if isdefined(obj) && !(Main.CLI.iscallable(obj))
-            return Entry(Number, obj)
-        end
+        mname = current_module_name()
+        fullname = parse(join([mname, obj], "."))
+        return Entry{Any}(obj, nothing, eval(fullname))
     end
 end
 
-function exec(entry::Entry{Number}, cmd::Command)
-    return eval(entry.fullname)
+function exec(entry::Entry{Any}, cmd::Command)
+    return entry.value
 end
 
 @register function parse(obj)::Type
