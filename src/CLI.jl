@@ -11,4 +11,12 @@ include("Parser.jl")
 
 include("Interface.jl")
 
+export main
+# short hands
+Base.@ccallable function main(debug=false)::Cint
+    stream = ARGStream(ARGS)
+    resolve(stream, __MAIN__; debug=debug)
+    return 0
+end
+
 end # module

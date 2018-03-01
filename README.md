@@ -38,8 +38,7 @@ add up
     x + y + extra
 end
 
-stream = ARGStream(ARGS)
-resolve(stream, CLI.__MAIN__; debug=false)
+main()
 ```
 
 ```shell
@@ -100,8 +99,7 @@ plus two integers
 end
 
 Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
-    stream = ARGStream(ARGS)
-    resolve(stream, CLI.__MAIN__; debug=false)
+    main()
 end
 
 end
