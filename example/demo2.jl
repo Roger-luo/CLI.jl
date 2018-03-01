@@ -12,5 +12,4 @@ add up
     x + y + extra
 end
 
-stream = ARGStream(ARGS)
-resolve(stream, CLI.__MAIN__; debug=false)
+main()

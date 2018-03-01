@@ -34,8 +34,7 @@ plus two integers
 end
 
 Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
-    stream = ARGStream(ARGS)
-    resolve(stream, CLI.__MAIN__; debug=false)
+    return main()
 end
 
 end
