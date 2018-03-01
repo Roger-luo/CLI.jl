@@ -3,6 +3,9 @@
 CLI.jl is a library for automatically generating command line interfaces from 
 absolutely Julia object. Is is highly inspired by [python-fire](https://github.com/google/python-fire). But thanks to Julia's powerful metaprogramming, we are able to do this in a much easier way. CLI.jl make use of Julia's metaprogramming and multiple dispatch feature.
 
+**warning** It only supports *nix systems at the moment. I have not tested it
+for **Windows**. Julia v0.6+ is required.
+
 ## Features
 
 - modular implementation
