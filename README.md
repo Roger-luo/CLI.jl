@@ -57,6 +57,7 @@ resolve(stream, CLI.__MAIN__; debug=false)
 You can create subcommands using Julia's modules. And then you can compile it
 to a binary application by [PackageCompiler.jl](https://github.com/JuliaLang/PackageCompiler.jl)
 
+## Use subcommands and Compile to Binary
 
 ```julia
 # demo.jl
@@ -110,6 +111,27 @@ then open a Julia REPL, type
 
 you will get an binary `demo`, simply copy it to where you want and use it.
 This will reduce your CLI start time significantly. Enjoy!
+
+## Advanced Customize
+
+**CLI.jl** offers several types to store your CLI application. You can directly
+use them to build a CLI application.
+
+```julia
+using CLI
+
+add(x::Int, y::Int) = x + y
+mul(x::Int, y::Int) = x * y
+
+leaf1 = LeafCommand(:add, add, Signature([Int, Int], []))
+leaf2 = LeafCommand(:mul, mul, Signature([Int, Int], []))
+node = NodeCommand("math", [leaf1, leaf2])
+
+maincmd = MainCommand("cal", [], [node])
+
+stream = ARGStream(ARGS)
+resolve(stream, maincmd; debug=false)
+```
 
 ## CLI Design Guidance
 
