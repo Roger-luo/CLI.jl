@@ -1,12 +1,12 @@
 # CLI
 
 CLI.jl is a library for automatically generating command line interfaces from 
-absolutely Julia object. Is is highly inspired by [python-fire](https://github.com/google/python-fire). But thanks to Julia's powerful metaprogramming, we are able to do this in a much easier way. CLI.jl make use of Julia's metaprogramming and multiple dispatch feature. It converts amost everything to CLI commands.
+absolutely Julia object. Is is highly inspired by [python-fire](https://github.com/google/python-fire). But thanks to Julia's powerful metaprogramming, we are able to do this in a much easier way. CLI.jl make use of Julia's metaprogramming and multiple dispatch feature.
 
 ## Features
 
 - modular implementation
-- converts most of the julia objects to CLI commands
+- compile to binary with [PackageCompiler.jl](https://github.com/JuliaLang/PackageCompiler.jl)
 
 # Installation
 
@@ -16,74 +16,106 @@ Pkg.clone(git@github.com:Roger-luo/CLI.jl.git)
 
 # Basic Usage
 
-You can call `@fire` on any Julia Object.
+You can call `@command` on julia functions.
 
 ```julia
-@fire struct Foo
-    x
+#demo.jl
+
+using CLI
+
+@command """
+this is a demo CLI
+"""
+
+
+"""
+add up
+"""
+@command function add(x::Int, y::Int; extra::Int=1)
+    x + y + extra
 end
 
-main()
+stream = ARGStream(ARGS)
+resolve(stream, CLI.__MAIN__; debug=false)
 ```
 
-```bash
-> julia foo.jl Foo 2
-Foo(2)
-```
+```shell
+> demo.jl --help
+[SYNOPSIS]
+	demo2.jl [-h,--help] [-v,--version] <command>
+[DESCRIPTION]
+	this is a demo CLI
 
-```julia
-@fire function add(x, y; z=2)
-    return x + y + z
-end
+[COMMANDS]
+	add
+	  add up
 
-main()
-```
-
-```bash
-> julia add.jl add 1 2
-5
-> julia add.jl add 1 2 --z=5
-8
-```
-
-```julia
-hello = "hello there!"
-@fire hello
-
-main()
-```
-
-```bash
-> julia hello.jl hello
-hello there!
 ```
 
 # Advanced
 
-CLI.jl implements two macros `register` and `fire`. The macro `@fire` is used to register entries and `@register` is used to register customed expression parsers, which will convert certain type of expression to an `Entry{T}` object.
+You can create subcommands using Julia's modules. And then you can compile it
+to a binary application by [PackageCompiler.jl](https://github.com/JuliaLang/PackageCompiler.jl)
 
-To define a parse rule, you have to specific which kind of expression it will parse by add type specification to the function, and the function should take only one arguement.
 
 ```julia
-@register function parse(obj)::Function
-    if isa(obj, Expr)
-        if obj.head == :function
-            sig = obj.args[1]
-            name = sig.args[1]
-            return Entry(Function, name)
-        end
-    end
+# demo.jl
+module demo
+using CLI
+
+@command """
+this is a demo CLI
+"""
+
+module math
+using CLI
+
+@command """
+math calculations
+"""
+
+"""
+add up
+"""
+@command function add(x::Int, y::Int; extra::Int=1)
+    x + y + extra
+end
+
+"""
+multiply two integers
+"""
+@command mul(x::Int, y::Int) = x * y
+
+end # math
+
+"""
+plus two integers
+"""
+@command function plus(x::Int, y::Int)
+    x + y    
+end
+
+Base.@ccallable function julia_main(ARGS::Vector{String})::Cint
+    stream = ARGStream(ARGS)
+    resolve(stream, CLI.__MAIN__; debug=false)
+end
+
 end
 ```
 
-By overloading `exec` method, one can tweak the way of executing certain type. The following is an example for executing `Function` entries. For example, this function defines how `Function` will be executed (it will take command line arguemetns as its arguements and options as its keywords).
-
-```julia
-function exec(entry::Entry{Function}, cmd::Command)
-    expr = Expr(:call, entry.fullname, Tuple(cmd.args)..., Tuple(cmd.options)...)
-    return eval(expr)
-end
+then open a Julia REPL, type
+```julia-repl
+> julia using PackageCompiler; build_executable("demo.jl")
 ```
+
+you will get an binary `demo`, simply copy it to where you want and use it.
+This will reduce your CLI start time significantly. Enjoy!
+
+## Future Plans
+
+- [ ] support `@command` for arbitrary Julia objects
+- [ ] further performance improvements (CLI start time)
+
 
 ## Author
 
