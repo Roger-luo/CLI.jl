@@ -111,6 +111,10 @@ then open a Julia REPL, type
 you will get an binary `demo`, simply copy it to where you want and use it.
 This will reduce your CLI start time significantly. Enjoy!
 
+## CLI Design Guidance
+
+**CLI.jl** accepts most CLI design syntax from [GNU CLI Standard](https://www.gnu.org/prep/standards/standards.html#Command_002dLine-Interfaces), [IEEE](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html) and other \*nix external programs, e.g `git`, `ls`, etc.
+
 ## Future Plans
 
 - [ ] support `@command` for arbitrary Julia objects
